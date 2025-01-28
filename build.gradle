@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id "com.github.node-gradle.node" version "7.1.0"
+}
+
+group = 'com.task'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+node {
+    version = '22.13.1'
+    npmVersion = '10.9.2'
+    download = true
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.register('buildReact', NpmTask) {
+    dependsOn npmInstall
+    args = ['run', 'build']
+    workingDir = file("$projectDir/ui") // Path to your React app
+}
+
+tasks.register('copyReactBuild', Copy) {
+    dependsOn buildReact
+    from 'ui/build'
+    into 'backend/src/main/resources/static'
+}
+tasks.register('buildBackend', GradleBuild) {
+    dependsOn copyReactBuild
+    description = 'Builds the backend'
+    dir = file('backend')
+    tasks = ['build']
+}
+
+
+build.dependsOn buildBackend

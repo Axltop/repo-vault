@@ -1,0 +1,38 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: vault
+  datasource:
+    url: jdbc:h2:mem:appdb
+    username: sa
+  h2:
+    console:
+      enabled: true  # Enable H2 web console
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  sql:
+    init:
+      platform: h2
+      mode: embedded
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+  file:
+    name: logs/spring-boot-app.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} - [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 7
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
