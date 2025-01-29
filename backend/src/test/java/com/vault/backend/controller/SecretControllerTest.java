@@ -7,6 +7,7 @@ import com.vault.backend.dto.SecretDTO;
 import com.vault.backend.exception.FieldNotUnique;
 import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
+import com.vault.backend.model.SecretEntity;
 import com.vault.backend.service.RepoService;
 import com.vault.backend.service.SecretService;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,18 +48,19 @@ public class SecretControllerTest {
     private RepoEntity repoEntity;
 
     private RandomGenerator randomGenerator = RandomGenerator.getDefault();
+
     @BeforeEach
     public void setUp() throws FieldNotUnique {
-        RepoDTO newRepo = new RepoDTO("http://"+ randomGenerator.ints().toString()+".com");
-       repoEntity=  repoService.addRepository(newRepo.getUrl());
+        RepoDTO newRepo = new RepoDTO("http://" + randomGenerator.ints().toString() + ".com");
+        repoEntity = repoService.addRepository(newRepo.getUrl());
     }
 
     @Test
     public void testAddSecret() throws Exception {
 
-        secretDTO = new SecretDTO(repoEntity.getId(), "12345");
+        secretDTO = new SecretDTO(repoEntity.getId(), null, "12345");
 
-        mockMvc.perform(post("/api/secrets/"+repoEntity.getId())
+        mockMvc.perform(post("/api/secrets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(secretDTO)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -68,11 +70,11 @@ public class SecretControllerTest {
     @Test
     public void testDeleteSecret() throws Exception, ResourceNotFound {
 
-        secretService.addSecret(repoEntity.getId(),"12345");
-        mockMvc.perform(delete("/api/secrets/{key}/{key2}", repoEntity.getId(),1))
+        SecretEntity secret = secretService.addSecret(new SecretDTO(repoEntity.getId(), null, "12345"));
+        mockMvc.perform(delete("/api/secrets/{id}", secret.getId()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        mockMvc.perform(delete("/api/secrets/{key}/{key2}", repoEntity.getId(),1))
+        mockMvc.perform(delete("/api/secrets/{id}", secret.getId()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 

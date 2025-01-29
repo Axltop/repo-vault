@@ -1,7 +1,6 @@
 package com.vault.backend.controller;
 
 
-
 import com.vault.backend.dto.SecretDTO;
 import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.SecretEntity;
@@ -20,21 +19,21 @@ public class SecretController {
         this.secretService = secretService;
     }
 
-    @PostMapping("/{repositoryId}")
-    public ResponseEntity<SecretEntity> addSecret(@PathVariable Long repositoryId, @RequestBody SecretDTO secretDTO) throws ResourceNotFound {
-        SecretEntity secret = secretService.addSecret(repositoryId, secretDTO.getSecret());
+    @PostMapping
+    public ResponseEntity<SecretEntity> addSecret(@RequestBody SecretDTO secretDTO) throws ResourceNotFound {
+        SecretEntity secret = secretService.addSecret(secretDTO);
         return ResponseEntity.ok(secret);
     }
 
-    @DeleteMapping("/{repositoryId}/{secretId}")
-    public ResponseEntity<Void> deleteSecret(@PathVariable Long repositoryId, @PathVariable Long secretId) throws ResourceNotFound {
-        secretService.deleteSecret(repositoryId, secretId);
+    @DeleteMapping("/{secretId}")
+    public ResponseEntity<Void> deleteSecret(@PathVariable Long secretId) throws ResourceNotFound {
+        secretService.deleteSecret(secretId);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{repositoryId}/validate")
-    public ResponseEntity<Boolean> validateSecret(@PathVariable Long repositoryId, @RequestBody SecretDTO secretDTO) {
-        boolean isValid = secretService.validateSecret(repositoryId, secretDTO.getSecret());
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> validateSecret( @RequestBody SecretDTO secretDTO) throws ResourceNotFound {
+        boolean isValid = secretService.validateSecret(secretDTO.getId(), secretDTO.getSecret());
         return ResponseEntity.ok(isValid);
     }
 }

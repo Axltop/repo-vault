@@ -91,11 +91,6 @@ const MuiRepoForm: React.FC<MuiRepoFormProps> = ({handleSubmitForm}) => {
                             >
                                 Add New
                             </Button>
-                            <Button variant={"contained"}
-                                    type={"reset"}
-                            >
-                               Clear
-                            </Button>
                         </Item>
                     </Grid2>
 

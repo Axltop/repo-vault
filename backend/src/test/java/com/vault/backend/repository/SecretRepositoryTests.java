@@ -30,7 +30,7 @@ public class SecretRepositoryTests {
     void setUp() {
         repository = new RepoEntity("http://example.com");
         repository = repositoryRepository.save(repository);
-        secret = new SecretEntity(HASHED_SECRET, repository);
+        secret = new SecretEntity(HASHED_SECRET, repository.getId());
     }
 
     @Test
@@ -40,14 +40,14 @@ public class SecretRepositoryTests {
         assertThat(savedSecret).isNotNull();
         assertThat(savedSecret.getId()).isNotNull();
         assertThat(savedSecret.getSecret()).isEqualTo(HASHED_SECRET);
-        assertThat(savedSecret.getRepository().getId()).isEqualTo(repository.getId());
+        assertThat(savedSecret.getRepositoryId()).isEqualTo(repository.getId());
     }
 
     @Test
     public void testFindByIdAndRepositoryId() {
         secret = secretRepository.save(secret);
 
-        Optional<SecretEntity> foundSecret = secretRepository.findByIdAndRepositoryId(secret.getId(), repository.getId());
+        Optional<SecretEntity> foundSecret = secretRepository.findById(secret.getId());
 
         assertThat(foundSecret).isPresent();
         assertThat(foundSecret.get().getSecret()).isEqualTo(HASHED_SECRET);
@@ -55,7 +55,7 @@ public class SecretRepositoryTests {
 
     @Test
     public void testFindByRepositoryId() {
-        SecretEntity secret2 = new SecretEntity("hashed-secret-2", repository);
+        SecretEntity secret2 = new SecretEntity("hashed-secret-2", repository.getId());
         secretRepository.save(secret);
         secretRepository.save(secret2);
 

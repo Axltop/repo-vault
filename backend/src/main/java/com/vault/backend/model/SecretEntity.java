@@ -17,16 +17,15 @@ public class SecretEntity {
 
     public String secret;
 
-    @ManyToOne
-    @JoinColumn(name = "repository_id", nullable = false)
-    private RepoEntity repository;
+    @Column(name = "repository_id", nullable = false)
+    private Long repositoryId;
 
     public SecretEntity() {
     }
 
-    public SecretEntity(String secret, RepoEntity repository) {
+    public SecretEntity(String secret, Long repositoryId) {
         this.secret = secret;
-        this.repository = repository;
+        this.repositoryId = repositoryId;
     }
 
 }

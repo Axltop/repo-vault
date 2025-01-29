@@ -1,6 +1,7 @@
 package com.vault.backend.service;
 
 
+import com.vault.backend.dto.SecretDTO;
 import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.model.SecretEntity;
@@ -46,21 +47,22 @@ public class SecretServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         repository = new RepoEntity("http://example.com");
-        secret = new SecretEntity(HASHED_SECRET, repository);
+        secret = new SecretEntity(HASHED_SECRET, repository.getId());
     }
 
     @Test
     public void testAddSecret() throws ResourceNotFound {
         repository.setId(REPOSITORY_ID);
 
+
         when(repoRepository.findById(REPOSITORY_ID)).thenReturn(Optional.of(repository));
         when(passwordEncoder.encode(RAW_SECRET)).thenReturn(HASHED_SECRET);
-        when(secretRepository.save(any(SecretEntity.class))).thenReturn(new SecretEntity(HASHED_SECRET, repository));
+        when(secretRepository.save(any(SecretEntity.class))).thenReturn(new SecretEntity(HASHED_SECRET, repository.getId()));
 
-        SecretEntity result = secretService.addSecret(REPOSITORY_ID, RAW_SECRET);
+        SecretEntity result = secretService.addSecret(new SecretDTO(REPOSITORY_ID, RAW_SECRET));
 
         assertEquals(HASHED_SECRET, result.getSecret());
-        assertEquals(REPOSITORY_ID, result.getRepository().getId());
+        assertEquals(REPOSITORY_ID, result.getRepositoryId());
         verify(secretRepository, times(1)).save(any(SecretEntity.class));
     }
 
@@ -69,9 +71,9 @@ public class SecretServiceTest {
         Long secretId = 1L;
         secret.setId(secretId);
 
-        when(secretRepository.findByIdAndRepositoryId(secretId, REPOSITORY_ID)).thenReturn(Optional.of(secret));
+        when(secretRepository.findById(secretId)).thenReturn(Optional.of(secret));
 
-        secretService.deleteSecret(REPOSITORY_ID, secretId);
+        secretService.deleteSecret( secretId);
 
         verify(secretRepository, times(1)).delete(secret);
     }
@@ -80,15 +82,15 @@ public class SecretServiceTest {
     public void testDeleteSecret_NotFound() {
         Long secretId = 999L;
 
-        when(secretRepository.findByIdAndRepositoryId(secretId, REPOSITORY_ID)).thenReturn(Optional.empty());
+        when(secretRepository.findById(secretId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFound.class, () -> {
-            secretService.deleteSecret(REPOSITORY_ID, secretId);
+            secretService.deleteSecret( secretId);
         });
     }
 
     @Test
-    public void testValidateSecret_Valid() {
+    public void testValidateSecret_Valid() throws ResourceNotFound {
         when(secretRepository.findByRepositoryId(REPOSITORY_ID)).thenReturn(List.of(secret));
         when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(true);
 
@@ -98,7 +100,7 @@ public class SecretServiceTest {
     }
 
     @Test
-    public void testValidateSecret_Invalid() {
+    public void testValidateSecret_Invalid() throws ResourceNotFound {
         when(secretRepository.findByRepositoryId(REPOSITORY_ID)).thenReturn(Arrays.asList(secret));
         when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(false);
 
