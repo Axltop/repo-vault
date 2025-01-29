@@ -1,7 +1,8 @@
 package com.vault.backend.controller;
 
 import com.vault.backend.dto.RepoDTO;
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.FieldNotUnique;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.repository.RepoRepository;
 import com.vault.backend.service.RepoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ public class RepoControllerUnitTest {
     }
 
     @Test
-    void addTest() {
+    void addTest() throws FieldNotUnique {
         String repoURL = "http://example.com";
         RepoDTO repoDTO = new RepoDTO(repoURL);
 
@@ -43,7 +44,7 @@ public class RepoControllerUnitTest {
     }
 
     @Test
-    void deleteTest() throws NotFoundException {
+    void deleteTest() throws ResourceNotFound {
         repoController.deleteRepository(1l);
         verify(repoService).deleteRepository(1l);
     }

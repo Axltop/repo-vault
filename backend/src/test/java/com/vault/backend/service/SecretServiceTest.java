@@ -1,7 +1,7 @@
 package com.vault.backend.service;
 
 
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.model.SecretEntity;
 import com.vault.backend.repository.RepoRepository;
@@ -50,7 +50,7 @@ public class SecretServiceTest {
     }
 
     @Test
-    public void testAddSecret() throws NotFoundException {
+    public void testAddSecret() throws ResourceNotFound {
         repository.setId(REPOSITORY_ID);
 
         when(repoRepository.findById(REPOSITORY_ID)).thenReturn(Optional.of(repository));
@@ -65,7 +65,7 @@ public class SecretServiceTest {
     }
 
     @Test
-    public void testDeleteSecret() throws NotFoundException {
+    public void testDeleteSecret() throws ResourceNotFound {
         Long secretId = 1L;
         secret.setId(secretId);
 
@@ -82,7 +82,7 @@ public class SecretServiceTest {
 
         when(secretRepository.findByIdAndRepositoryId(secretId, REPOSITORY_ID)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> {
+        assertThrows(ResourceNotFound.class, () -> {
             secretService.deleteSecret(REPOSITORY_ID, secretId);
         });
     }

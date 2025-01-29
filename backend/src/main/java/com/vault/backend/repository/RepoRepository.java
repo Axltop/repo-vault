@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface RepoRepository extends JpaRepository<RepoEntity, Long> {
 
     Optional<RepoEntity> findOneById(Long id);
+
+    boolean existsByUrl(String url);
 }

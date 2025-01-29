@@ -1,6 +1,7 @@
 package com.vault.backend.service;
 
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.FieldNotUnique;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.repository.RepoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ public class RepoServiceTest {
     }
 
     @Test
-    void testAddRepository() {
+    void testAddRepository() throws FieldNotUnique {
         String url = "http://example.com";
         RepoEntity repository = new RepoEntity(url);
         when(repositoryRepository.save(any(RepoEntity.class))).thenReturn(repository);
@@ -57,7 +58,7 @@ public class RepoServiceTest {
     }
 
     @Test
-    void testDeleteRepository() throws NotFoundException {
+    void testDeleteRepository() throws ResourceNotFound {
         Long id = 1L;
         when(repositoryRepository.findOneById(id)).thenReturn(Optional.of(new RepoEntity("http://repo1.com")));
 

@@ -1,6 +1,6 @@
 package com.vault.backend.service;
 
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.repository.RepoRepository;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.model.SecretEntity;
@@ -23,16 +23,16 @@ public class SecretService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public SecretEntity addSecret(Long repositoryId, String rawSecret) throws NotFoundException {
-        RepoEntity repository = repoRepository.findById(repositoryId).orElseThrow(NotFoundException::new);
+    public SecretEntity addSecret(Long repositoryId, String rawSecret) throws ResourceNotFound {
+        RepoEntity repository = repoRepository.findById(repositoryId).orElseThrow(ResourceNotFound::new);
         String hashedSecret = passwordEncoder.encode(rawSecret);
         SecretEntity secret = new SecretEntity(hashedSecret, repository);
         return secretRepository.save(secret);
     }
 
-    public void deleteSecret(Long repositoryId, Long secretId) throws NotFoundException {
+    public void deleteSecret(Long repositoryId, Long secretId) throws ResourceNotFound {
         SecretEntity secret = secretRepository.findByIdAndRepositoryId(secretId, repositoryId)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(ResourceNotFound::new);
         secretRepository.delete(secret);
     }
 

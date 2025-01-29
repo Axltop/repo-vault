@@ -1,7 +1,7 @@
 package com.vault.backend.exception;
 
-public class NotFoundException extends Throwable{
-    public NotFoundException() {
+public class ResourceNotFound extends Throwable{
+    public ResourceNotFound() {
         super("Resource Not Found");
     }
 }

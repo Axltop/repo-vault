@@ -2,7 +2,7 @@ package com.vault.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+// TODO add message handler
 @SpringBootApplication
 public class BackendApplication {
 

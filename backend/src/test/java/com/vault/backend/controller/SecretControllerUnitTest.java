@@ -1,7 +1,7 @@
 package com.vault.backend.controller;
 
 import com.vault.backend.dto.SecretDTO;
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.service.SecretService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,14 +26,14 @@ public class SecretControllerUnitTest {
     }
 
     @Test
-    void saveTest() throws NotFoundException {
+    void saveTest() throws ResourceNotFound {
        secretController.addSecret(1L,new SecretDTO(1L,"12345"));
 
        verify(secretService,times(1)).addSecret(1L,"12345");
     }
 
     @Test
-    void deleteTest() throws NotFoundException {
+    void deleteTest() throws ResourceNotFound {
         secretController.deleteSecret(1L,1L);
         verify(secretService,times(1)).deleteSecret(1L,1L);
     }

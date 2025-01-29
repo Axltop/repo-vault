@@ -3,7 +3,7 @@ package com.vault.backend.controller;
 
 
 import com.vault.backend.dto.SecretDTO;
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.SecretEntity;
 import com.vault.backend.service.SecretService;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +21,13 @@ public class SecretController {
     }
 
     @PostMapping("/{repositoryId}")
-    public ResponseEntity<SecretEntity> addSecret(@PathVariable Long repositoryId, @RequestBody SecretDTO secretDTO) throws NotFoundException {
+    public ResponseEntity<SecretEntity> addSecret(@PathVariable Long repositoryId, @RequestBody SecretDTO secretDTO) throws ResourceNotFound {
         SecretEntity secret = secretService.addSecret(repositoryId, secretDTO.getSecret());
         return ResponseEntity.ok(secret);
     }
 
     @DeleteMapping("/{repositoryId}/{secretId}")
-    public ResponseEntity<Void> deleteSecret(@PathVariable Long repositoryId, @PathVariable Long secretId) throws NotFoundException {
+    public ResponseEntity<Void> deleteSecret(@PathVariable Long repositoryId, @PathVariable Long secretId) throws ResourceNotFound {
         secretService.deleteSecret(repositoryId, secretId);
         return ResponseEntity.noContent().build();
     }

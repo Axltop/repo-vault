@@ -2,7 +2,8 @@ package com.vault.backend.controller;
 
 
 import com.vault.backend.dto.RepoDTO;
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.FieldNotUnique;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.service.RepoService;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class RepoController {
     }
 
     @PostMapping
-    public ResponseEntity<RepoEntity> addRepository(@RequestBody RepoDTO repositoryDTO) {
+    public ResponseEntity<RepoEntity> addRepository(@RequestBody RepoDTO repositoryDTO) throws FieldNotUnique {
         RepoEntity repository = repoService.addRepository(repositoryDTO.getUrl());
         return ResponseEntity.ok(repository);
     }
@@ -32,7 +33,7 @@ public class RepoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRepository(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteRepository(@PathVariable Long id) throws ResourceNotFound {
         repoService.deleteRepository(id);
         return ResponseEntity.noContent().build();
     }

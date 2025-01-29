@@ -1,7 +1,8 @@
 package com.vault.backend.service;
 
 
-import com.vault.backend.exception.NotFoundException;
+import com.vault.backend.exception.FieldNotUnique;
+import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.repository.RepoRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,10 @@ public class RepoService {
         this.repoRepository = repoRepository;
     }
 
-    public RepoEntity addRepository(String url) {
+    public RepoEntity addRepository(String url) throws FieldNotUnique {
+        if(repoRepository.existsByUrl(url)){
+            throw new FieldNotUnique(url);
+        }
         RepoEntity repository = new RepoEntity(url);
         return repoRepository.save(repository);
     }
@@ -26,8 +30,8 @@ public class RepoService {
         return repoRepository.findAll();
     }
 
-    public void deleteRepository(Long id) throws NotFoundException {
-        repoRepository.findOneById(id).orElseThrow(NotFoundException::new);
+    public void deleteRepository(Long id) throws ResourceNotFound {
+        repoRepository.findOneById(id).orElseThrow(ResourceNotFound::new);
         repoRepository.deleteById(id);
     }
 }

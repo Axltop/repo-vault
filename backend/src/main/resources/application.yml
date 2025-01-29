@@ -19,8 +19,8 @@ spring:
       mode: embedded
 logging:
   level:
-    root: INFO
-    org.springframework.web: INFO
+    root: ERROR
+    org.springframework.web: ERROR
   file:
     name: logs/spring-boot-app.log
   pattern:
