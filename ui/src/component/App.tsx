@@ -5,6 +5,7 @@ import Divider from '@mui/material/Divider';
 import MuiRepoForm from "./mui-repo-form";
 import {API_ENDPOINTS} from "../const/endpoints";
 import SnackbarWrapper from "./mui-snackbar-wrapper";
+import FormDialog from "./mui-secret-dialog";
 function createData(
     id:number,
     url:string
@@ -44,13 +45,16 @@ export default function App() {
 
 
     }
-
-    useEffect(() => {
+    const getRepos = async () => {
         fetch(API_ENDPOINTS.repo)
             .then(response => response.json())
             .then((fetchedData) => setRepoData(fetchedData.map(
                 (item: any) => createData(item.id, item.url)
             )));
+    }
+
+    useEffect(() => {
+       getRepos()
     }, []);
 
     // Function to handle adding a Snackbar
@@ -68,11 +72,41 @@ export default function App() {
         setSnackbars(updatedSnackbars);
     };
 
+    const deleteRepo = async (id:number) => {
+            await fetch(`${API_ENDPOINTS.repo}/${id}`, {
+                method:'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then((fetchedData) => {
+                getRepos()
+            })
+            .then(() => addSnackbar('Repo deleted successfully', 'success',6000))
+            .catch((error) => {addSnackbar(error.message, 'error',null)})
+    }
+
+    const addSecret = async (repoId:number) => {
+        await fetch(`${API_ENDPOINTS.secret}/${repoId}`, {
+            method:'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then((fetchedData) => {
+                getRepos()
+            })
+            .then(() => addSnackbar('Secret successfully', 'success',6000))
+            .catch((error) => {addSnackbar(error.message, 'error',null)})
+    }
+
     return (
     <div className="App">
         <MuiRepoForm handleSubmitForm={handleSubmitForm}/>
         <Divider/>
-        <BasicTable tableData={repoData ? repoData : null} />
+        <BasicTable tableData={repoData ? repoData : null} deleteRepo={deleteRepo} addSecret={addSecret}/>
         <SnackbarWrapper snackbars={snackbars} handleCloseSnackbar={handleCloseSnackbar} />
     </div>
   );

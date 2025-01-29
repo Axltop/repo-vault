@@ -6,13 +6,16 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {useEffect} from "react";
-import {API_ENDPOINTS} from "../const/endpoints";
+import {Button} from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import {Key} from "@mui/icons-material";
 
 interface BasicTableProps {
     tableData: { id: number; url: string }[] | null;
+    deleteRepo: (id:number) => void;
+    addSecret: (repoId:number) => void;
 }
- const BasicTable: React.FC<BasicTableProps> = ({tableData}) => {
+ const BasicTable: React.FC<BasicTableProps> = ({tableData,deleteRepo,addSecret}) => {
 
     return (
         <TableContainer component={Paper}>
@@ -20,8 +23,8 @@ interface BasicTableProps {
                 <TableHead>
                     <TableRow>
                         <TableCell>ID#</TableCell>
-                        <TableCell align="right">URL</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell align="left">URL</TableCell>
+                        <TableCell align="left">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -34,6 +37,15 @@ interface BasicTableProps {
                                 {row.id}
                             </TableCell>
                             <TableCell>{row.url}</TableCell>
+
+                            <TableCell>
+                                <Button variant="outlined" color={"error"} startIcon={<DeleteIcon />}  onClick={() => deleteRepo(row.id)}>
+                                    Delete
+                                </Button>
+                                <Button variant="outlined" color={"primary"} startIcon={<Key />}  onClick={() => addSecret(row.id)}>
+                                    Add Secret
+                                </Button>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
