@@ -19,23 +19,15 @@ node {
     version = '22.13.1'
     npmVersion = '10.9.2'
     download = true
+    nodeProjectDir = file("$projectDir/ui")
 }
 
 test {
     useJUnitPlatform()
 }
 
-tasks.register('npmInstall1', NpmTask) {
-    workingDir = file("$projectDir/ui")
-    args = ['install']
-    doLast {
-        println 'npm install completed'
-    }
-}
-
-
 tasks.register('buildReact', NpmTask) {
-    dependsOn npmInstall1
+    dependsOn npmInstall
     args = ['run', 'build']
     workingDir = file("$projectDir/ui") // Path to your React app
 }
