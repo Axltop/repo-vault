@@ -10,4 +10,4 @@ the application should be available on `localhost:8080` by default
 
 for full api documentation check `/swagger-ui/index.html`
 
-## Initial build of the project can take several minutes to build because of the dependencies download
+### Initial build of the project can take several minutes to build because of the dependencies download
