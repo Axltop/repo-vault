@@ -34,4 +34,8 @@ public class RepoService {
         repoRepository.findOneById(id).orElseThrow(ResourceNotFound::new);
         repoRepository.deleteById(id);
     }
+
+    public RepoEntity getRepository(Long id) throws ResourceNotFound {
+        return repoRepository.findOneById(id).orElseThrow(ResourceNotFound::new);
+    }
 }

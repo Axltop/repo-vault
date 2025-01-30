@@ -35,6 +35,9 @@ public class SecretServiceTest {
     private RepoRepository repoRepository;
 
     @Mock
+    private RepoService repoService;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
@@ -47,15 +50,14 @@ public class SecretServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         repository = new RepoEntity("http://example.com");
-        secret = new SecretEntity(HASHED_SECRET, repository.getId());
+        secret = new SecretEntity(RAW_SECRET, repository.getId());
     }
 
     @Test
     public void testAddSecret() throws ResourceNotFound {
         repository.setId(REPOSITORY_ID);
 
-
-        when(repoRepository.findById(REPOSITORY_ID)).thenReturn(Optional.of(repository));
+        when(repoService.getRepository(REPOSITORY_ID)).thenReturn(repository);
         when(passwordEncoder.encode(RAW_SECRET)).thenReturn(HASHED_SECRET);
         when(secretRepository.save(any(SecretEntity.class))).thenReturn(new SecretEntity(HASHED_SECRET, repository.getId()));
 
@@ -91,20 +93,24 @@ public class SecretServiceTest {
 
     @Test
     public void testValidateSecret_Valid() throws ResourceNotFound {
-        when(secretRepository.findByRepositoryId(REPOSITORY_ID)).thenReturn(List.of(secret));
         when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(true);
+        secret.setSecret(HASHED_SECRET);
+        secret.setRepositoryId(REPOSITORY_ID);
+        when(secretRepository.findById(secret.getId())).thenReturn(Optional.ofNullable(secret));
 
-        boolean result = secretService.validateSecret(REPOSITORY_ID, RAW_SECRET);
+        boolean result = secretService.validateSecret(secret.getId(), RAW_SECRET);
 
         assertTrue(result);
     }
 
     @Test
     public void testValidateSecret_Invalid() throws ResourceNotFound {
-        when(secretRepository.findByRepositoryId(REPOSITORY_ID)).thenReturn(Arrays.asList(secret));
+        secret.setSecret(HASHED_SECRET);
+        secret.setRepositoryId(REPOSITORY_ID);
+        when(secretRepository.findById(secret.getId())).thenReturn(Optional.ofNullable(secret));
         when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(false);
 
-        boolean result = secretService.validateSecret(REPOSITORY_ID, RAW_SECRET);
+        boolean result = secretService.validateSecret(secret.getId(), RAW_SECRET);
 
         assertFalse(result);
     }

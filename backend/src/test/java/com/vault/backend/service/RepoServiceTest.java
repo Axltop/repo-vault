@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class RepoServiceTest {
@@ -65,5 +67,36 @@ public class RepoServiceTest {
         repoService.deleteRepository(id);
 
         verify(repositoryRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    void addRepositoryNotUnique() {
+        String url = "http://example.com";
+        RepoEntity repository = new RepoEntity(url);
+        when(repositoryRepository.existsByUrl(url)).thenReturn(true);
+        FieldNotUnique exception = assertThrows(FieldNotUnique.class, () -> {
+            repoService.addRepository(url);
+        });
+        verify(repositoryRepository, never()).save(any(RepoEntity.class));
+        verify(repositoryRepository, times(1)).existsByUrl(url);
+        assertEquals(String.format("%s is already saved.", url), exception.getMessage());
+    }
+
+    @Test
+    void getRepository() throws ResourceNotFound {
+
+        when(repositoryRepository.findOneById(1L)).thenReturn(Optional.of(new RepoEntity("http://example.com")));
+        repoService.getRepository(1L);
+        verify(repositoryRepository, times(1)).findOneById(1L);
+    }
+
+    @Test
+    void getRepositoryNoResource() throws ResourceNotFound {
+        when(repositoryRepository.findOneById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFound exception = assertThrows(ResourceNotFound.class, () -> {
+            repoService.getRepository(1L);
+        });
+        verify(repositoryRepository, times(1)).findOneById(1L);
     }
 }

@@ -15,19 +15,16 @@ import java.util.List;
 public class SecretService {
 
     private final SecretRepository secretRepository;
-    private final RepoRepository repoRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public SecretService(final SecretRepository secretRepository, RepoRepository repoRepository, final PasswordEncoder passwordEncoder) {
+    public SecretService(final SecretRepository secretRepository, PasswordEncoder passwordEncoder) {
         this.secretRepository = secretRepository;
-        this.repoRepository = repoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     public SecretEntity addSecret(SecretDTO secretDTO) throws ResourceNotFound {
-        RepoEntity repository = repoRepository.findById(secretDTO.getRepoId()).orElseThrow(ResourceNotFound::new);
         String hashedSecret = passwordEncoder.encode(secretDTO.getSecret());
-        SecretEntity secret = new SecretEntity(hashedSecret, repository.getId());
+        SecretEntity secret = new SecretEntity(hashedSecret, secretDTO.getRepoId());
         return secretRepository.save(secret);
     }
 
