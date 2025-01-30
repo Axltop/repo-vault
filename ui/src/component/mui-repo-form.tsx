@@ -68,7 +68,7 @@ const MuiRepoForm: React.FC<MuiRepoFormProps> = ({handleSubmitForm}) => {
     }
     return (
         <Box sx={{flexGrow: 1}}>
-            <form>
+            <form onSubmit={(event) => {handleSubmit(event as React.SyntheticEvent);}}>
                 <Grid2 container spacing={2}>
                     <Grid2 size={12}>
                         <Item>

@@ -6,7 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {Button, Grid2, TextField} from "@mui/material";
+import {Button, Container, Grid2, TextField} from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Add, Key} from "@mui/icons-material";
 import Box from '@mui/material/Box';
@@ -32,7 +32,7 @@ const BasicTable: React.FC<BasicTableProps> = ({tableData, deleteRepo, addSecret
                     <TableRow>
                         <TableCell>ID#</TableCell>
                         <TableCell align="left">URL</TableCell>
-                        <TableCell align="left">Actions</TableCell>
+                        <TableCell align="right">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -110,35 +110,38 @@ function Row(props: {
                 </TableCell>
                 <TableCell>{row.url}</TableCell>
 
-                <TableCell>
-                    <Button variant="contained" color={"error"} startIcon={<DeleteIcon/>}
+                <TableCell align={"right"}>
+                    <Button variant="contained" color={"error"}
                             onClick={() => props.deleteRepo(row.id)}>
-                        Delete
+                        <DeleteIcon/>
                     </Button>
-                     &nbsp;
+                    &nbsp;
                     <Button
                         color={"primary"}
                         variant={"contained"}
                         aria-label="expand row"
                         onClick={() => setOpen(!open)}
                     >
-                        {open ? <React.Fragment> <Key/><KeyboardArrowUpIcon/>Secrets</React.Fragment> :
-                            <React.Fragment><Key/><KeyboardArrowDownIcon/>Secrets</React.Fragment>}
+                        {open ? <React.Fragment> <Key/><KeyboardArrowUpIcon/></React.Fragment> :
+                            <React.Fragment><Key/><KeyboardArrowDownIcon/></React.Fragment>}
                     </Button>
                 </TableCell>
             </TableRow>
             <TableRow>
                 <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{margin: 1}}>
-                            <Grid2 container spacing={4}>
-                                <Grid2 size={{xs: 12, sm: 6}}>
-                                    <Typography variant="h6" gutterBottom component="div">
-                                        Secrets
-                                    </Typography>
-                                </Grid2>
-                                <Grid2 size={{xs: 12, sm: 6}}>
-                                    <Box component={"form"}>
+                        <Container>
+
+
+                            <Box sx={{margin: 1}}>
+                                <Grid2 container direction="row"
+                                       spacing={4} sx={{alignItems: "flex-end", justifyContent: "space-between"}}>
+                                    <Grid2 >
+                                        <Typography variant="h6" gutterBottom component="div">
+                                            Secrets
+                                        </Typography>
+                                    </Grid2>
+                                    <Grid2 >
                                         <TextField required={true}
                                                    value={formData?.secret}
                                                    size={"small"}
@@ -149,52 +152,51 @@ function Row(props: {
                                                    onChange={handleChangeSecret}/>
                                         &nbsp;
                                         <Button variant={"outlined"} onClick={handleClick}><Add/></Button>
-                                    </Box>
-
+                                    </Grid2>
                                 </Grid2>
-                            </Grid2>
-                            <Table size="small" aria-label="secrets">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Id</TableCell>
-                                        <TableCell>Secret</TableCell>
-                                        <TableCell>Validate</TableCell>
-                                        <TableCell align="right">Actions</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {row.secrets && row?.secrets.map((secret) => (
-                                        <TableRow key={secret.id}>
-                                            <TableCell component="th" scope="row">
-                                                {secret.id}
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                {secret.secret}
-                                            </TableCell>
-                                            <TableCell>
-                                                <form>
-                                                    <TextField type={"password"}
-                                                               size={"small"}
-                                                               value={validateSecretData.secret}
-                                                               onChange={(e) => setValidateSecretData({
-                                                                   ...validateSecretData,
-                                                                   secret: e.target.value
-                                                               })}/>
-                                                    &nbsp;
-                                                    <Button variant={"contained"} color={"primary"}
-                                                            disabled={!validateSecretData.secret}
-                                                            onClick={() => props.validateSecret(secret.id, validateSecretData.secret || "")}><Add/></Button>
-                                                </form>
-                                            </TableCell>
-                                            <TableCell component="th" scope="row">
-                                                <Button variant={"contained"} color={"error"}
-                                                        onClick={() => props.deleteSecret(secret.id)}><DeleteIcon/></Button>
-                                            </TableCell>
+                                <Table size="small" aria-label="secrets">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Id</TableCell>
+                                            <TableCell>Secret</TableCell>
+                                            <TableCell>Validate</TableCell>
+                                            <TableCell align="right">Actions</TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </Box>
+                                    </TableHead>
+                                    <TableBody>
+                                        {row.secrets && row?.secrets.map((secret) => (
+                                            <TableRow key={secret.id}>
+                                                <TableCell component="th" scope="row">
+                                                    {secret.id}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    {secret.secret}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <form>
+                                                        <TextField type={"password"}
+                                                                   size={"small"}
+                                                                   value={validateSecretData.secret}
+                                                                   onChange={(e) => setValidateSecretData({
+                                                                       ...validateSecretData,
+                                                                       secret: e.target.value
+                                                                   })}/>
+                                                        &nbsp;
+                                                        <Button variant={"contained"} color={"primary"}
+                                                                disabled={!validateSecretData.secret}
+                                                                onClick={() => props.validateSecret(secret.id, validateSecretData.secret || "")}><Add/></Button>
+                                                    </form>
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <Button variant={"contained"} color={"error"}
+                                                            onClick={() => props.deleteSecret(secret.id)}><DeleteIcon/></Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Container>
                     </Collapse>
                 </TableCell>
             </TableRow>

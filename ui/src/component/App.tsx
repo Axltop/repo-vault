@@ -5,6 +5,8 @@ import Divider from '@mui/material/Divider';
 import MuiRepoForm from "./mui-repo-form";
 import {API_ENDPOINTS} from "../const/endpoints";
 import SnackbarWrapper from "./mui-snackbar-wrapper";
+import Box from "@mui/material/Box";
+import {Container, CssBaseline, Toolbar} from "@mui/material";
 
 
 // TODO improve layout
@@ -149,12 +151,22 @@ export default function App() {
     }
 
     return (
-        <div className="App">
-            <MuiRepoForm handleSubmitForm={handleSubmitForm}/>
-            <Divider/>
-            <BasicTable tableData={repoData ? repoData : null} deleteRepo={deleteRepo} addSecret={addSecret}
-                        deleteSecret={deleteSecret} validateSecret={validateSecret}/>
-            <SnackbarWrapper snackbars={snackbars} handleCloseSnackbar={handleCloseSnackbar}/>
-        </div>
+
+        <Box sx={{display: "flex"}}>
+            <CssBaseline/>
+            <Box component="main"
+                 sx={{flexGrow: 1, p: 3, transition: "margin 0.3s"}}>
+                <Toolbar />
+                <Container>
+                    <MuiRepoForm handleSubmitForm={handleSubmitForm}/>
+                    <Divider/>
+                    <BasicTable tableData={repoData ? repoData : null} deleteRepo={deleteRepo} addSecret={addSecret}
+                                deleteSecret={deleteSecret} validateSecret={validateSecret}/>
+                    <SnackbarWrapper snackbars={snackbars} handleCloseSnackbar={handleCloseSnackbar}/>
+                </Container>
+
+            </Box>
+        </Box>
     );
 }
+//todo form does not work on enter
