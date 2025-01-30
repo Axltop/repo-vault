@@ -2,18 +2,17 @@ package com.vault.backend.service;
 
 import com.vault.backend.dto.SecretDTO;
 import com.vault.backend.exception.ResourceNotFound;
-
 import com.vault.backend.model.SecretEntity;
 import com.vault.backend.repository.SecretRepository;
 import com.vault.backend.utils.AESGCMEncryptionUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class SecretService {
+
     @Value("${encrypt-key}")
     private String encryptKey;
 

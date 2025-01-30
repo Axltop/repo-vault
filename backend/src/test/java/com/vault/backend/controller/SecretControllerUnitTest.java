@@ -2,7 +2,6 @@ package com.vault.backend.controller;
 
 import com.vault.backend.dto.SecretDTO;
 import com.vault.backend.exception.ResourceNotFound;
-import com.vault.backend.model.SecretEntity;
 import com.vault.backend.service.SecretService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +43,7 @@ public class SecretControllerUnitTest {
     void validateTest() throws ResourceNotFound, Exception {
         SecretDTO secretDTO = new SecretDTO();
         secretDTO.setSecret("12345");
-        secretDTO.setId(1L);
+        secretDTO.setRepoId(1L);
 
         secretController.validateSecret(secretDTO);
         verify(secretService,times(1)).validateSecret(1L,secretDTO.getSecret());

@@ -1,20 +1,18 @@
 package com.vault.backend.service;
 
-
 import com.vault.backend.dto.SecretDTO;
 import com.vault.backend.exception.ResourceNotFound;
 import com.vault.backend.model.RepoEntity;
 import com.vault.backend.model.SecretEntity;
-import com.vault.backend.repository.RepoRepository;
 import com.vault.backend.repository.SecretRepository;
+import com.vault.backend.utils.AESGCMEncryptionUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,18 +25,13 @@ public class SecretServiceTest {
     private static final String HASHED_SECRET = "hashed-secret";
     private static final String RAW_SECRET = "raw-secret";
     private static final Long REPOSITORY_ID = 1L;
+    private static final String ENCRYPT_KEY = "super-secret-encrypt-key";
 
     @Mock
     private SecretRepository secretRepository;
 
     @Mock
-    private RepoRepository repoRepository;
-
-    @Mock
     private RepoService repoService;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private SecretService secretService;
@@ -49,6 +42,8 @@ public class SecretServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        ReflectionTestUtils.setField(secretService, "encryptKey", ENCRYPT_KEY);
+
         repository = new RepoEntity("http://example.com");
         secret = new SecretEntity(RAW_SECRET, repository.getId());
     }
@@ -58,10 +53,9 @@ public class SecretServiceTest {
         repository.setId(REPOSITORY_ID);
 
         when(repoService.getRepository(REPOSITORY_ID)).thenReturn(repository);
-        when(passwordEncoder.encode(RAW_SECRET)).thenReturn(HASHED_SECRET);
         when(secretRepository.save(any(SecretEntity.class))).thenReturn(new SecretEntity(HASHED_SECRET, repository.getId()));
 
-        SecretEntity result = secretService.addSecret(new SecretDTO(REPOSITORY_ID, RAW_SECRET));
+        SecretEntity result = secretService.addSecret(new SecretDTO(REPOSITORY_ID, null,RAW_SECRET));
 
         assertEquals(HASHED_SECRET, result.getSecret());
         assertEquals(REPOSITORY_ID, result.getRepositoryId());
@@ -93,10 +87,9 @@ public class SecretServiceTest {
 
     @Test
     public void testValidateSecret_Valid() throws ResourceNotFound, Exception {
-        when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(true);
-        secret.setSecret(HASHED_SECRET);
+        secret.setSecret(AESGCMEncryptionUtil.encrypt(RAW_SECRET,AESGCMEncryptionUtil.generateKey(ENCRYPT_KEY)));
         secret.setRepositoryId(REPOSITORY_ID);
-        when(secretRepository.findById(secret.getId())).thenReturn(Optional.ofNullable(secret));
+        when(secretRepository.findByRepositoryId(secret.getId())).thenReturn(List.of(secret));
 
         boolean result = secretService.validateSecret(secret.getId(), RAW_SECRET);
 
@@ -108,7 +101,7 @@ public class SecretServiceTest {
         secret.setSecret(HASHED_SECRET);
         secret.setRepositoryId(REPOSITORY_ID);
         when(secretRepository.findById(secret.getId())).thenReturn(Optional.ofNullable(secret));
-        when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(false);
+
 
         boolean result = secretService.validateSecret(secret.getId(), RAW_SECRET);
 
