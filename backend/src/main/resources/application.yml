@@ -36,3 +36,4 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+encrypt-key: super-secret-encrypt-key

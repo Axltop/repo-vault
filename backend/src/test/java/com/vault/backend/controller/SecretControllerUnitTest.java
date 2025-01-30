@@ -27,7 +27,7 @@ public class SecretControllerUnitTest {
     }
 
     @Test
-    void saveTest() throws ResourceNotFound {
+    void saveTest() throws ResourceNotFound, Exception {
         SecretDTO secretDTO = new SecretDTO(1L,"12345");
        secretController.addSecret(secretDTO);
 
@@ -41,7 +41,7 @@ public class SecretControllerUnitTest {
     }
 
     @Test
-    void validateTest() throws ResourceNotFound {
+    void validateTest() throws ResourceNotFound, Exception {
         SecretDTO secretDTO = new SecretDTO();
         secretDTO.setSecret("12345");
         secretDTO.setId(1L);

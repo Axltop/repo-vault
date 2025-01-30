@@ -20,7 +20,7 @@ public class SecretController {
     }
 
     @PostMapping
-    public ResponseEntity<SecretEntity> addSecret(@RequestBody SecretDTO secretDTO) throws ResourceNotFound {
+    public ResponseEntity<SecretEntity> addSecret(@RequestBody SecretDTO secretDTO) throws ResourceNotFound, Exception {
         SecretEntity secret = secretService.addSecret(secretDTO);
         return ResponseEntity.ok(secret);
     }
@@ -32,8 +32,13 @@ public class SecretController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<Boolean> validateSecret( @RequestBody SecretDTO secretDTO) throws ResourceNotFound {
-        boolean isValid = secretService.validateSecret(secretDTO.getId(), secretDTO.getSecret());
+    public ResponseEntity<Boolean> validateSecret( @RequestBody SecretDTO secretDTO) throws ResourceNotFound, Exception {
+        boolean isValid = secretService.validateSecret(secretDTO.getRepoId(), secretDTO.getSecret());
         return ResponseEntity.ok(isValid);
+    }
+
+    @PostMapping("/decode")
+    public ResponseEntity<SecretDTO> decodeSecret( @RequestBody SecretDTO secretDTO) throws ResourceNotFound, Exception {
+        return ResponseEntity.ok(secretService.decodeSecret(secretDTO));
     }
 }

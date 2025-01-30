@@ -54,7 +54,7 @@ public class SecretServiceTest {
     }
 
     @Test
-    public void testAddSecret() throws ResourceNotFound {
+    public void testAddSecret() throws ResourceNotFound, Exception {
         repository.setId(REPOSITORY_ID);
 
         when(repoService.getRepository(REPOSITORY_ID)).thenReturn(repository);
@@ -92,7 +92,7 @@ public class SecretServiceTest {
     }
 
     @Test
-    public void testValidateSecret_Valid() throws ResourceNotFound {
+    public void testValidateSecret_Valid() throws ResourceNotFound, Exception {
         when(passwordEncoder.matches(RAW_SECRET, HASHED_SECRET)).thenReturn(true);
         secret.setSecret(HASHED_SECRET);
         secret.setRepositoryId(REPOSITORY_ID);
@@ -104,7 +104,7 @@ public class SecretServiceTest {
     }
 
     @Test
-    public void testValidateSecret_Invalid() throws ResourceNotFound {
+    public void testValidateSecret_Invalid() throws ResourceNotFound, Exception {
         secret.setSecret(HASHED_SECRET);
         secret.setRepositoryId(REPOSITORY_ID);
         when(secretRepository.findById(secret.getId())).thenReturn(Optional.ofNullable(secret));

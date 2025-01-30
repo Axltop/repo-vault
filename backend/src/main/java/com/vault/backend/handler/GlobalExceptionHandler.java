@@ -12,11 +12,12 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler  {
+
     @ExceptionHandler(ResourceNotFound.class)
     public ResponseEntity<Object> handleExceptionNotFound(ResourceNotFound ex) {
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map(ex.getMessage()));
     }
+
     @ExceptionHandler(FieldNotUnique.class)
     public ResponseEntity<Object> handleExceptionNotFound(FieldNotUnique ex) {
         Map<String,String> response = new HashMap<>();

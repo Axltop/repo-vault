@@ -6,7 +6,8 @@ import MuiRepoForm from "./mui-repo-form";
 import {API_ENDPOINTS} from "../const/endpoints";
 import SnackbarWrapper from "./mui-snackbar-wrapper";
 import Box from "@mui/material/Box";
-import {Container, CssBaseline, Toolbar} from "@mui/material";
+import {AppBar, Container, CssBaseline, Toolbar} from "@mui/material";
+import Typography from "@mui/material/Typography";
 
 
 // TODO improve layout
@@ -133,9 +134,10 @@ export default function App() {
             })
     }
 
-    const validateSecret = async (id: number, secret: string) => {
+    const validateSecret = async (repoId: number, secret: string) => {
 
-        const payload = {id, secret}
+        const payload = {repoId, secret}
+        //todo add to constants
         await fetch(`${API_ENDPOINTS.secret}/validate`, {
             method: 'POST',
             headers: {
@@ -144,7 +146,14 @@ export default function App() {
             },
             body: JSON.stringify(payload),
         })
-            .then(() => addSnackbar('Secret is correct.', 'success', 6000))
+            .then((response ) => response.text())
+            .then((fetchedData) => {
+                if(fetchedData === "false"){
+                    throw new Error("Secret is incorrect.");
+                }
+                addSnackbar('Secret is correct.', 'success', 6000)
+
+            })
             .catch((error) => {
                 addSnackbar(error.message, 'error', null)
             })
@@ -152,12 +161,18 @@ export default function App() {
 
     return (
 
-        <Box sx={{display: "flex"}}>
-            <CssBaseline/>
+
             <Box component="main"
                  sx={{flexGrow: 1, p: 3, transition: "margin 0.3s"}}>
-                <Toolbar />
+
                 <Container>
+                    <AppBar position="static" >
+
+                        <Typography variant={"h2"} align={"center"} component={"div"}>
+                            Vault Service
+                        </Typography>
+
+                    </AppBar>
                     <MuiRepoForm handleSubmitForm={handleSubmitForm}/>
                     <Divider/>
                     <BasicTable tableData={repoData ? repoData : null} deleteRepo={deleteRepo} addSecret={addSecret}
@@ -166,7 +181,7 @@ export default function App() {
                 </Container>
 
             </Box>
-        </Box>
+
     );
 }
 //todo form does not work on enter

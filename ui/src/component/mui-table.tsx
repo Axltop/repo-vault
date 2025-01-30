@@ -8,12 +8,13 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {Button, Container, Grid2, TextField} from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {Add, Key} from "@mui/icons-material";
+import {Add, Check, Key, Visibility, VisibilityOff} from "@mui/icons-material";
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import {API_ENDPOINTS} from "../const/endpoints";
 
 interface BasicTableProps {
     tableData: { id: number; url: string, secrets: { id: number, secret: string }[] }[] | null;
@@ -53,16 +54,15 @@ function Row(props: {
     deleteRepo: (id: number) => void,
     addSecret: (repoId: number, secret: string) => void,
     deleteSecret: (id: number) => void,
-    validateSecret: (id: number, secret: string) => void;
+    validateSecret: (repoId: number, secret: string) => void;
 }) {
     const {row} = props;
     const [open, setOpen] = React.useState(false);
     const [formErorrs, setFormErrors] = React.useState<Array<{ field: string, message: string }> | null>(null);
     const [formData, setFormData] = React.useState<{ secret: string } | null>({secret: ""});
-    const [validateSecretData, setValidateSecretData] = React.useState<{
-        id: number | null,
-        secret: string | null
-    }>({id: null, secret: null});
+
+    const [decodedSecret, setDecodedSecret] = React.useState<{ id: number; secret: string } | null>(null);
+
     const handleChangeSecret = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
             secret: e.target.value
@@ -81,8 +81,8 @@ function Row(props: {
         } else {
             setFormErrors(errors);
         }
-        ;
     }
+
 
     const validateForm = (formData: { secret: string } | null) => {
         var errorsArr = [];
@@ -99,6 +99,39 @@ function Row(props: {
     const isValidForm = (errors: Array<{ field: string, message: string }> | null): boolean => {
         return errors?.length === 0;
     }
+
+    const handleVisibilityOn = async (id: number) => {
+
+        const payload = {id}
+        await fetch(`${API_ENDPOINTS.decode}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+            .then((response) => response.json())
+            .then((fetchedData) => {
+                setDecodedSecret(fetchedData)
+            })
+    }
+    const handleVisibilityOff = () => {
+        setDecodedSecret(null);
+    }
+
+    const handleValidateSecret = (event: React.FormEvent) => {
+            event.preventDefault();
+            const errorsArr = validateForm(formData || {secret: ""});
+            if(isValidForm(errorsArr)){
+                props.validateSecret(row.id, formData?.secret || "")
+                setFormErrors(null);
+            }else {
+             setFormErrors(errorsArr)
+            }
+
+    }
+
     return (
         <React.Fragment>
             <TableRow
@@ -132,26 +165,33 @@ function Row(props: {
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Container>
 
-
                             <Box sx={{margin: 1}}>
                                 <Grid2 container direction="row"
                                        spacing={4} sx={{alignItems: "flex-end", justifyContent: "space-between"}}>
-                                    <Grid2 >
+                                    <Grid2>
                                         <Typography variant="h6" gutterBottom component="div">
                                             Secrets
                                         </Typography>
                                     </Grid2>
-                                    <Grid2 >
-                                        <TextField required={true}
-                                                   value={formData?.secret}
-                                                   size={"small"}
-                                                   variant={"outlined"}
-                                                   label={"Add Secret"}
-                                                   error={formErorrs?.some(e => e.field === "secret")}
-                                                   helperText={formErorrs?.find(e => e.field === "secret")?.message}
-                                                   onChange={handleChangeSecret}/>
-                                        &nbsp;
-                                        <Button variant={"outlined"} onClick={handleClick}><Add/></Button>
+                                    <Grid2>
+                                        <form onSubmit={(event) => {
+                                            event.preventDefault()
+                                        }}>
+                                            <TextField required={true}
+                                                       value={formData?.secret}
+                                                       size={"small"}
+                                                       variant={"outlined"}
+                                                       label={"Secret"}
+                                                       error={formErorrs?.some(e => e.field === "secret")}
+                                                       helperText={formErorrs?.find(e => e.field === "secret")?.message}
+                                                       onChange={handleChangeSecret}/>
+                                            &nbsp;
+                                            <Button variant={"outlined"} onClick={handleClick} ><Add/></Button>
+                                            &nbsp;
+                                            <Button variant={"contained"} color={"primary"}
+                                                    onClick={handleValidateSecret}><Check/></Button>
+
+                                        </form>
                                     </Grid2>
                                 </Grid2>
                                 <Table size="small" aria-label="secrets">
@@ -159,7 +199,6 @@ function Row(props: {
                                         <TableRow>
                                             <TableCell>Id</TableCell>
                                             <TableCell>Secret</TableCell>
-                                            <TableCell>Validate</TableCell>
                                             <TableCell align="right">Actions</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -170,24 +209,25 @@ function Row(props: {
                                                     {secret.id}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    {secret.secret}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <form>
-                                                        <TextField type={"password"}
-                                                                   size={"small"}
-                                                                   value={validateSecretData.secret}
-                                                                   onChange={(e) => setValidateSecretData({
-                                                                       ...validateSecretData,
-                                                                       secret: e.target.value
-                                                                   })}/>
-                                                        &nbsp;
+                                                    <TextField
+                                                        type={secret.id === decodedSecret?.id ? "text" : "password"}
+                                                        size={"small"}
+                                                        value={secret.id === decodedSecret?.id ? decodedSecret.secret : secret.secret}
+                                                        disabled={true}
+                                                    />
+
+                                                    {secret.id !== decodedSecret?.id ?
                                                         <Button variant={"contained"} color={"primary"}
-                                                                disabled={!validateSecretData.secret}
-                                                                onClick={() => props.validateSecret(secret.id, validateSecretData.secret || "")}><Add/></Button>
-                                                    </form>
+                                                                onClick={() => handleVisibilityOn(secret.id)}><VisibilityOff/></Button>
+
+                                                        :
+
+                                                        <Button variant={"contained"} color={"primary"}
+                                                                onClick={() => handleVisibilityOff()}>
+                                                            <Visibility/></Button>
+                                                    }
                                                 </TableCell>
-                                                <TableCell component="th" scope="row">
+                                                <TableCell component="th" scope="row" align={"right"}>
                                                     <Button variant={"contained"} color={"error"}
                                                             onClick={() => props.deleteSecret(secret.id)}><DeleteIcon/></Button>
                                                 </TableCell>
