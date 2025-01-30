@@ -49,8 +49,6 @@ public class SecretServiceTest {
        } catch (Exception e) {
            throw new RuntimeException(e);
        }
-        ;
-
     }
 
     @Test

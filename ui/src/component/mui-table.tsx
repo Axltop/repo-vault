@@ -71,7 +71,7 @@ function Row(props: {
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        var errors: Array<{ field: string, message: string }> | null = null;
+        var errors: Array<{ field: string, message: string }> | null;
         errors = validateForm(formData || {secret: ""});
 
         if (isValidForm(errors)) {

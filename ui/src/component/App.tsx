@@ -6,7 +6,7 @@ import MuiRepoForm from "./mui-repo-form";
 import {API_ENDPOINTS} from "../const/endpoints";
 import SnackbarWrapper from "./mui-snackbar-wrapper";
 import Box from "@mui/material/Box";
-import {AppBar, Container, CssBaseline, Toolbar} from "@mui/material";
+import {AppBar, Container} from "@mui/material";
 import Typography from "@mui/material/Typography";
 
 export default function App() {
@@ -87,7 +87,7 @@ export default function App() {
                 'Content-Type': 'application/json'
             },
         })
-            .then((fetchedData) => {
+            .then(() => {
                 getRepos()
             })
             .then(() => addSnackbar('Repo deleted successfully', 'success', 6000))
@@ -103,7 +103,7 @@ export default function App() {
                 'Content-Type': 'application/json'
             },
         })
-            .then((fetchedData) => {
+            .then(() => {
                 getRepos()
             })
             .then(() => addSnackbar('Secret deleted successfully', 'success', 6000))
@@ -123,7 +123,7 @@ export default function App() {
             },
             body: JSON.stringify(payload),
         })
-            .then((fetchedData) => {
+            .then(() => {
                 getRepos()
             })
             .then(() => addSnackbar('Secret saved successfully', 'success', 6000))
