@@ -12,14 +12,12 @@ import java.util.List;
 @Entity
 @Table(name = "repository")
 public class RepoEntity {
-//    TODO store url in db?
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @Column(unique = true,nullable = true)
+    @Column(unique = true,nullable = false)
     private String url;
 
     @JsonInclude

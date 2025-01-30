@@ -12,7 +12,7 @@ public class AESGCMEncryptionUtil {
     private static final int IV_SIZE = 12; // Recommended IV size for GCM
     private static final int TAG_LENGTH = 128; // Authentication tag length (bits)
 
-    public static SecretKey generateKey(String encryptionKey) throws Exception {
+    public static SecretKey generateKey(String encryptionKey) {
         byte[] keyBytes = Base64.getDecoder().decode(Base64.getEncoder().encodeToString(encryptionKey.getBytes()));
         return new SecretKeySpec(keyBytes, "AES");
     }

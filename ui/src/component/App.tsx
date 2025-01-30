@@ -9,8 +9,6 @@ import Box from "@mui/material/Box";
 import {AppBar, Container, CssBaseline, Toolbar} from "@mui/material";
 import Typography from "@mui/material/Typography";
 
-
-// TODO improve layout
 export default function App() {
 
     const [repoData, setRepoData] = React.useState<{
@@ -98,7 +96,7 @@ export default function App() {
             })
     }
     const deleteSecret = async (id: number) => {
-        await fetch(`${API_ENDPOINTS.secret}/${id}`, {
+        await fetch(`${API_ENDPOINTS.secret.main}/${id}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -117,7 +115,7 @@ export default function App() {
     const addSecret = async (repoId: number, secret: string) => {
 
         const payload = {repoId, secret}
-        await fetch(`${API_ENDPOINTS.secret}`, {
+        await fetch(`${API_ENDPOINTS.secret.main}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -137,8 +135,7 @@ export default function App() {
     const validateSecret = async (repoId: number, secret: string) => {
 
         const payload = {repoId, secret}
-        //todo add to constants
-        await fetch(`${API_ENDPOINTS.secret}/validate`, {
+        await fetch(`${API_ENDPOINTS.secret.validate}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -184,4 +181,3 @@ export default function App() {
 
     );
 }
-//todo form does not work on enter

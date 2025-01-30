@@ -103,7 +103,7 @@ function Row(props: {
     const handleVisibilityOn = async (id: number) => {
 
         const payload = {id}
-        await fetch(`${API_ENDPOINTS.decode}`, {
+        await fetch(`${API_ENDPOINTS.secret.decode}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

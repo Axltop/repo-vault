@@ -41,11 +41,16 @@ public class SecretServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(secretService, "encryptKey", ENCRYPT_KEY);
+       try( AutoCloseable closeable = MockitoAnnotations.openMocks(this)){
+           ReflectionTestUtils.setField(secretService, "encryptKey", ENCRYPT_KEY);
 
-        repository = new RepoEntity("http://example.com");
-        secret = new SecretEntity(RAW_SECRET, repository.getId());
+           repository = new RepoEntity("http://example.com");
+           secret = new SecretEntity(RAW_SECRET, repository.getId());
+       } catch (Exception e) {
+           throw new RuntimeException(e);
+       }
+        ;
+
     }
 
     @Test
@@ -55,7 +60,7 @@ public class SecretServiceTest {
         when(repoService.getRepository(REPOSITORY_ID)).thenReturn(repository);
         when(secretRepository.save(any(SecretEntity.class))).thenReturn(new SecretEntity(HASHED_SECRET, repository.getId()));
 
-        SecretEntity result = secretService.addSecret(new SecretDTO(REPOSITORY_ID, null,RAW_SECRET));
+        SecretEntity result = secretService.addSecret(new SecretDTO(REPOSITORY_ID, null, RAW_SECRET));
 
         assertEquals(HASHED_SECRET, result.getSecret());
         assertEquals(REPOSITORY_ID, result.getRepositoryId());
@@ -69,7 +74,7 @@ public class SecretServiceTest {
 
         when(secretRepository.findById(secretId)).thenReturn(Optional.of(secret));
 
-        secretService.deleteSecret( secretId);
+        secretService.deleteSecret(secretId);
 
         verify(secretRepository, times(1)).delete(secret);
     }
@@ -80,14 +85,12 @@ public class SecretServiceTest {
 
         when(secretRepository.findById(secretId)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFound.class, () -> {
-            secretService.deleteSecret( secretId);
-        });
+        assertThrows(ResourceNotFound.class, () -> secretService.deleteSecret(secretId));
     }
 
     @Test
     public void testValidateSecret_Valid() throws ResourceNotFound, Exception {
-        secret.setSecret(AESGCMEncryptionUtil.encrypt(RAW_SECRET,AESGCMEncryptionUtil.generateKey(ENCRYPT_KEY)));
+        secret.setSecret(AESGCMEncryptionUtil.encrypt(RAW_SECRET, AESGCMEncryptionUtil.generateKey(ENCRYPT_KEY)));
         secret.setRepositoryId(REPOSITORY_ID);
         when(secretRepository.findByRepositoryId(secret.getId())).thenReturn(List.of(secret));
 
